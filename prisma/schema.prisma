@@ -1,0 +1,26 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String?
+  createdAt     DateTime       @default(now())
+  conversations Conversation[]
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  userId    String
+ user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moduleId  Int      // Numéro du module CS50 (ex: 0, 1, 2...)
+  messages  Json     // Tableau JSON stockant l'historique des échanges avec Socrate
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

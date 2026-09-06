@@ -5,21 +5,29 @@ import CourseAssistantSidebar from "@/components/CourseAssistantSidebar";
 import { CS50_MODULES } from "@/config/courseModules";
 
 export default function CoursePage() {
-  // L'état qui mémorise la semaine actuellement sélectionnée par l'étudiant
   const [activeModuleId, setActiveModuleId] = useState(0);
-  
-  // On récupère les infos du module actif
-  const activeModule = CS50_MODULES.find(m => m.id === activeModuleId) || CS50_MODULES[0];
+  const activeModule = CS50_MODULES.find((m) => m.id === activeModuleId) || CS50_MODULES[0];
+
+  // Fonction magique pour transformer n'importe quel lien YouTube en URL embed propre
+  const getEmbedUrl = (url?: string) => {
+    if (!url) return "";
+    // Si c'est déjà un lien embed
+    if (url.includes("/embed/")) return url;
+    // Sinon, on extrait l'ID de la vidéo du lien watch?v=...
+    const match = url.match(/(?:v=|\/embed\/|\/v\/|youtu\.be\/)([^&?]+)/);
+    return match ? `https://www.youtube.com/embed/${match[1]}?enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}` : url;
+  };
 
   return (
     <div className="flex h-screen bg-slate-950 text-slate-300 overflow-hidden font-sans">
       
-      {/* 1. MENU DE NAVIGATION (COLONNE GAUCHE) */}
+      {/* MENU DE NAVIGATION LATÉRAL GAUCHE */}
       <nav className="w-64 border-r border-slate-800 bg-slate-900 flex flex-col z-10 shadow-xl">
         <div className="p-6 border-b border-slate-800">
           <h1 className="text-2xl font-extrabold text-white">Savoir IA</h1>
           <p className="text-xs text-indigo-400 mt-1 font-medium">CS50x Francophone</p>
         </div>
+        
         <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
           {CS50_MODULES.map((mod) => (
             <button
@@ -27,8 +35,8 @@ export default function CoursePage() {
               onClick={() => setActiveModuleId(mod.id)}
               className={`w-full text-left px-4 py-3 rounded-xl transition-all text-sm font-medium ${
                 activeModuleId === mod.id
-                  ? "bg-indigo-600 text-white shadow-md"
-                  : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
+                  : "text-slate-400 hover:bg-slate-800/60 hover:text-white"
               }`}
             >
               {mod.title}
@@ -37,51 +45,56 @@ export default function CoursePage() {
         </div>
       </nav>
 
-      {/* 2. CONTENU DU COURS (COLONNE CENTRALE) */}
-      <main className="flex-1 overflow-y-auto custom-scrollbar relative">
-        <div className="max-w-4xl mx-auto p-8">
+      {/* ZONE CENTRALE : LECTEUR VIDÉO INTÉGRÉ & RÉSUMÉ */}
+      <main className="flex-1 flex flex-col items-center justify-center p-6 bg-slate-950 overflow-y-auto">
+        <div className="w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col items-center relative overflow-hidden">
           
-          <header className="mb-8 border-b border-slate-800 pb-6">
-            <div className="inline-block px-3 py-1 bg-slate-800 text-indigo-300 rounded-full text-xs font-semibold mb-3">
+          {/* Effet lumineux d'arrière-plan */}
+          <div className="absolute -top-24 -left-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          {/* En-tête : Titre et Module */}
+          <div className="w-full flex justify-between items-center mb-4">
+            <span className="bg-indigo-600/25 text-indigo-300 text-xs font-semibold px-3.5 py-1 rounded-full border border-indigo-500/30 shadow-sm">
               Module {activeModule.id}
-            </div>
-            <h1 className="text-4xl font-extrabold text-white mb-2">
+            </span>
+            <h2 className="text-lg font-bold text-white tracking-tight">
               {activeModule.title}
-            </h1>
-          </header>
-
-          {/* Lecteur Vidéo Dynamique */}
-          <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl mb-12 border border-slate-800">
-            <iframe 
-             key={activeModule.id}
-             width="100%"
-             height="100%"
-             src={`https://www.youtube.com/embed/${activeModule.youtubeId}`}
-             title={activeModule.title}
-             frameBorder="0"
-             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-             allowFullScreen>
-            </iframe>
+            </h2>
           </div>
 
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white">Espace de travail</h2>
-            <div className="bg-slate-900 p-8 rounded-2xl border border-slate-800">
-              <p className="text-slate-400 text-sm">
-                Visionnez la vidéo de cours ci-dessus. Si vous êtes bloqué sur un concept ou un problème de la {activeModule.title.split(' : ')[0].toLowerCase()}, posez votre question à Socrate dans la barre latérale.
-              </p>
-            </div>
+          {/* LECTEUR VIDÉO INTÉGRÉ (Iframe sécurisé anti-erreur 153) */}
+          <div className="w-full aspect-video bg-black rounded-xl overflow-hidden border border-slate-800 shadow-inner mb-4 relative">
+            {activeModule.videoUrl ? (
+              <iframe
+                src={getEmbedUrl(activeModule.videoUrl)}
+                title={activeModule.title}
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-slate-500 text-xs">
+                Vidéo non disponible pour ce module
+              </div>
+            )}
           </div>
-          
+
+          {/* Résumé de la vidéo en bas du lecteur */}
+          <div className="w-full bg-slate-950/50 p-4 rounded-xl border border-slate-800/80 text-left">
+            <h4 className="text-xs font-semibold text-indigo-300 mb-1 flex items-center gap-1.5">
+              <span>📺</span> Résumé de la vidéo principale
+            </h4>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              {activeModule.videoSummary || "Aucun résumé disponible."}
+            </p>
+          </div>
+
         </div>
       </main>
 
-      {/* 3. TUTEUR IA (COLONNE DROITE) */}
-      <div className="w-96 border-l border-slate-800 bg-slate-900 shadow-2xl z-20 flex flex-col">
-        {/* L'astuce React : la clé "key" force la sidebar à se recharger quand on change de module */}
-        <CourseAssistantSidebar key={activeModule.id} moduleId={activeModule.id} />
-      </div>
-      
+      {/* BARRE LATÉRALE DROITE : TUTEUR SOCRATE + PODCAST + NOTEBOOK */}
+      <CourseAssistantSidebar moduleId={activeModuleId} />
+
     </div>
   );
 }
