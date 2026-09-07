@@ -13,14 +13,110 @@ model User {
   name          String?
   createdAt     DateTime       @default(now())
   conversations Conversation[]
+  quizAttempts  QuizAttempt[]
 }
 
 model Conversation {
   id        String   @id @default(cuid())
   userId    String
- user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   moduleId  Int      // Numéro du module CS50 (ex: 0, 1, 2...)
   messages  Json     // Tableau JSON stockant l'historique des échanges avec Socrate
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum DayOfWeek {
+  MONDAY
+  WEDNESDAY
+  FRIDAY
+}
+
+model CourseModule {
+  id           Int           @id // 0 à 10 correspondant aux semaines CS50x
+  title        String
+  slug         String        @unique
+  description  String?       @db.Text
+  videoUrl     String?
+  videoSummary VideoSummary?
+  audioScripts AudioScript[]
+  quizzes      Quiz[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model VideoSummary {
+  id                  String       @id @default(cuid())
+  moduleId            Int          @unique
+  module              CourseModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title               String
+  overview            String       @db.Text
+  keyConcepts         Json         // Tableau de { term: string, definition: string, importance: string }
+  timelineBreakdown   Json         // Tableau de { timestamp?: string, title: string, description: string, keyPoints: string[] }
+  codeExamples        Json?        // Tableau de { language: string, title: string, code: string, explanation: string }
+  pedagogicalTakeaway String       @db.Text
+  fullMarkdown        String       @db.Text
+  generatedAt         DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+}
+
+model AudioScript {
+  id                    String       @id @default(cuid())
+  moduleId              Int
+  module                CourseModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  dayOfWeek             DayOfWeek
+  title                 String
+  pedagogicalObjective  String       @db.Text
+  targetDurationMinutes Int          @default(5)
+  dialogue              Json         // Tableau de { speaker: "Socrate" | "Étudiant", text: string }
+  cleanTtsText          String       @db.Text // Texte spécialement nettoyé pour le moteur de Text-to-Speech
+  audioUrl              String?      // Fichier audio physique généré (ex: /podcasts/semaine0-lundi.mp3)
+  quizzes               Quiz[]
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+
+  @@unique([moduleId, dayOfWeek])
+}
+
+model Quiz {
+  id            String         @id @default(cuid())
+  moduleId      Int
+  module        CourseModule   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  audioScriptId String?
+  audioScript   AudioScript?   @relation(fields: [audioScriptId], references: [id], onDelete: SetNull)
+  dayOfWeek     DayOfWeek
+  title         String
+  description   String?        @db.Text
+  questions     QuizQuestion[]
+  attempts      QuizAttempt[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@unique([moduleId, dayOfWeek])
+}
+
+model QuizQuestion {
+  id            String   @id @default(cuid())
+  quizId        String
+  quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  order         Int
+  question      String   @db.Text
+  options       Json     // Tableau de { id: string, label: string, text: string }
+  correctOption String   // "A", "B", "C" ou "D"
+  explanation   String   @db.Text // Justification pédagogique détaillée et analyse des pièges
+  conceptTested String
+  createdAt     DateTime @default(now())
+}
+
+model QuizAttempt {
+  id        String   @id @default(cuid())
+  quizId    String
+  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  answers   Json     // { questionId: selectedOption }
+  score     Int
+  total     Int
+  passed    Boolean
+  createdAt DateTime @default(now())
 }
