@@ -18,6 +18,8 @@ interface Props {
   pedagogicalData?: any;
   onInteract?: () => void;
   onContentUpdated?: () => void;
+  isOpenOnMobile?: boolean;
+  onCloseMobile?: () => void;
 }
 
 type DayType = "MONDAY" | "WEDNESDAY" | "FRIDAY";
@@ -27,6 +29,8 @@ export default function CourseAssistantSidebar({
   pedagogicalData,
   onInteract,
   onContentUpdated,
+  isOpenOnMobile = false,
+  onCloseMobile,
 }: Props) {
   const currentModule = CS50_MODULES[moduleId] ?? CS50_MODULES[0];
 
@@ -340,7 +344,39 @@ export default function CourseAssistantSidebar({
 
   return (
     <>
-      <aside className="w-96 flex flex-col h-screen bg-slate-950 text-slate-100 p-4 shadow-2xl shrink-0 overflow-y-auto custom-scrollbar">
+      {isOpenOnMobile && (
+        <div
+          onClick={onCloseMobile}
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden transition-opacity"
+        />
+      )}
+
+      <aside
+        className={`
+          fixed top-0 right-0 z-50 h-screen w-full sm:w-96 bg-slate-950 text-slate-100 p-4 shadow-2xl flex flex-col overflow-y-auto custom-scrollbar border-l border-slate-800 transition-transform duration-300 ease-in-out
+          lg:static lg:translate-x-0 lg:z-auto lg:h-screen lg:shrink-0 lg:border-l-0
+          ${isOpenOnMobile ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
+          ${!isOpenOnMobile ? "hidden lg:flex" : "flex"}
+        `}
+      >
+        {/* Entête Mobile de fermeture */}
+        <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3 lg:hidden">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🎙️</span>
+            <div>
+              <h3 className="font-bold text-sm text-white">Socrate — Tuteur Vocal</h3>
+              <p className="text-[11px] text-indigo-400 font-medium">{currentModule.title}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            className="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition"
+            aria-label="Fermer le tuteur Socrate"
+          >
+            ✕
+          </button>
+        </div>
         
         {/* --- PANNEAU PÉDAGOGIQUE DU MODULE --- */}
         <div className="mb-4 p-4 rounded-xl bg-slate-900 border border-slate-800 shadow-sm relative overflow-hidden space-y-3">

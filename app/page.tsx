@@ -28,6 +28,8 @@ export default function CoursePage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationMsg, setGenerationMsg] = useState<string | null>(null);
   const [isFocusMode, setIsFocusMode] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Charge les données pédagogiques du module sélectionné
   useEffect(() => {
@@ -96,27 +98,98 @@ export default function CoursePage() {
   const videoSummary: VideoSummaryData | null = modulePayload?.videoSummary || null;
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-300 overflow-hidden font-sans">
+    <div className="flex flex-col lg:flex-row h-screen bg-slate-950 text-slate-300 overflow-hidden font-sans relative">
       
-      {/* MENU DE NAVIGATION LATÉRAL GAUCHE */}
+      {/* BARRE SUPÉRIEURE MOBILE */}
+      <header className="flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800 shrink-0 z-30 lg:hidden">
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => setIsMobileNavOpen(true)}
+            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white transition flex items-center justify-center"
+            aria-label="Ouvrir le menu des semaines"
+          >
+            <span className="text-lg leading-none">☰</span>
+          </button>
+          <div>
+            <h1 className="text-sm font-bold text-white leading-tight">Savoir IA</h1>
+            <span className="text-[10px] text-indigo-400 font-medium">Semaine {activeModule.id}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Link
+            href="/dashboard"
+            className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold transition"
+            title="Progression"
+          >
+            📊
+          </Link>
+          <button
+            type="button"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-600/30 transition flex items-center gap-1.5"
+          >
+            <span>🎙️</span>
+            <span>Socrate</span>
+          </button>
+        </div>
+      </header>
+
+      {/* OVERLAY SOMBRE LORSQUE LE MENU MOBILE EST OUVERT */}
+      {isMobileNavOpen && (
+        <div
+          onClick={() => setIsMobileNavOpen(false)}
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden transition-opacity"
+        />
+      )}
+
+      {/* MENU DE NAVIGATION LATÉRAL GAUCHE (TIROIR COULISSANT MOBILE / FIXE DESKTOP) */}
       {!isFocusMode && (
-        <nav className="w-64 border-r border-slate-800 bg-slate-900 flex flex-col z-10 shadow-xl shrink-0 transition-all duration-300">
-          <div className="p-6 border-b border-slate-800">
-            <h1 className="text-2xl font-extrabold text-white">Savoir IA</h1>
-            <p className="text-xs text-indigo-400 mt-1 font-medium">CS50x Francophone</p>
-            <Link href="/dashboard" className="mt-4 block w-full text-center px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition">
+        <nav
+          className={`
+            fixed top-0 left-0 z-50 h-screen w-72 sm:w-80 bg-slate-900 border-r border-slate-800 flex flex-col shadow-2xl transition-transform duration-300 ease-in-out
+            lg:static lg:translate-x-0 lg:z-10 lg:h-full lg:w-64 lg:shadow-xl lg:shrink-0
+            ${isMobileNavOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+            ${!isMobileNavOpen ? "hidden lg:flex" : "flex"}
+          `}
+        >
+          <div className="p-5 sm:p-6 border-b border-slate-800 flex items-center justify-between">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-extrabold text-white">Savoir IA</h1>
+              <p className="text-xs text-indigo-400 mt-0.5 font-medium">CS50x Francophone</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsMobileNavOpen(false)}
+              className="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition lg:hidden"
+              aria-label="Fermer le menu"
+            >
+              ✕
+            </button>
+          </div>
+          
+          <div className="px-5 pt-3">
+            <Link
+              href="/dashboard"
+              onClick={() => setIsMobileNavOpen(false)}
+              className="block w-full text-center px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition"
+            >
               📊 Ma Progression
             </Link>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-4 space-y-1.5 sm:space-y-2 custom-scrollbar">
             {CS50_MODULES.map((mod) => (
               <button
                 key={mod.id}
-                onClick={() => setActiveModuleId(mod.id)}
-                className={`w-full text-left px-4 py-3 rounded-xl transition-all text-sm font-medium ${
+                onClick={() => {
+                  setActiveModuleId(mod.id);
+                  setIsMobileNavOpen(false);
+                }}
+                className={`w-full text-left px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-xl transition-all text-xs sm:text-sm font-medium ${
                   activeModuleId === mod.id
-                    ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
+                    ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 font-semibold"
                     : "text-slate-400 hover:bg-slate-800/60 hover:text-white"
                 }`}
               >
@@ -128,29 +201,29 @@ export default function CoursePage() {
       )}
 
       {/* ZONE CENTRALE : LECTEUR VIDÉO & GRANDS RÉSUMÉS PÉDAGOGIQUES */}
-      <main className="flex-1 flex flex-col items-center p-6 bg-slate-950 overflow-y-auto custom-scrollbar">
-        <div className="w-full max-w-4xl space-y-6">
+      <main className="flex-1 flex flex-col items-center p-3 sm:p-6 bg-slate-950 overflow-y-auto custom-scrollbar w-full min-w-0">
+        <div className="w-full max-w-4xl space-y-5 sm:space-y-6">
           
           {/* En-tête du Module avec Action de Génération */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex justify-between items-center relative overflow-hidden">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative overflow-hidden">
             <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="bg-indigo-600/25 text-indigo-300 text-xs font-semibold px-3 py-1 rounded-full border border-indigo-500/30">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="bg-indigo-600/25 text-indigo-300 text-xs font-semibold px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full border border-indigo-500/30">
                   Semaine {activeModule.id}
                 </span>
                 {videoSummary && (
-                  <span className="bg-emerald-600/20 text-emerald-300 text-[11px] font-semibold px-2.5 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1">
+                  <span className="bg-emerald-600/20 text-emerald-300 text-[10px] sm:text-[11px] font-semibold px-2.5 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1">
                     ✓ Contenus IA synchronisés
                   </span>
                 )}
               </div>
-              <h2 className="text-xl font-bold text-white tracking-tight">
+              <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
                 {activeModule.title}
               </h2>
             </div>
 
             {/* Bouton Génération / Statut & Focus Mode */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
               {generationMsg && (
                 <span className="text-xs text-indigo-300 font-medium animate-pulse">
                   {generationMsg}
@@ -159,7 +232,7 @@ export default function CoursePage() {
               <button
                 type="button"
                 onClick={() => setIsFocusMode(!isFocusMode)}
-                className="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-white shadow transition flex items-center gap-1.5"
+                className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-white shadow transition flex items-center gap-1.5"
                 title={isFocusMode ? "Quitter le mode focus" : "Passer en mode focus"}
               >
                 {isFocusMode ? "🔙 Quitter Focus" : "🔍 Mode Focus"}
@@ -168,7 +241,7 @@ export default function CoursePage() {
                 type="button"
                 onClick={handleGenerateModule}
                 disabled={isGenerating}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-lg shadow-indigo-600/25 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-lg shadow-indigo-600/25 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
                 title="Génère ou met à jour les résumés, audios et quiz avec Google Gemini"
               >
                 {isGenerating ? (
@@ -176,7 +249,7 @@ export default function CoursePage() {
                 ) : (
                   "⚡"
                 )}
-                {isGenerating ? "Génération en cours..." : videoSummary ? "Régénérer avec l'IA" : "Générer les contenus"}
+                {isGenerating ? "Génération..." : videoSummary ? "Régénérer avec l'IA" : "Générer les contenus"}
               </button>
             </div>
           </div>
@@ -191,12 +264,12 @@ export default function CoursePage() {
             />
           </div>
           
-          {/* Barre de navigation interne (Tabs) */}
-          <div className="flex flex-wrap gap-2 pt-2 border-b border-slate-800/60 pb-3">
+          {/* Barre de navigation interne (Tabs avec défilement horizontal fluide sur mobile) */}
+          <div className="overflow-x-auto scrollbar-none flex gap-1.5 sm:gap-2 pt-2 border-b border-slate-800/60 pb-3 max-w-full">
               <button
                 type="button"
                 onClick={() => setActiveTab("markdown")}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
+                className={`px-3 py-1.5 sm:px-3.5 rounded-lg text-xs font-semibold transition whitespace-nowrap shrink-0 ${
                   activeTab === "markdown"
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
                     : "text-slate-400 hover:text-white hover:bg-slate-800"
@@ -208,7 +281,7 @@ export default function CoursePage() {
               <button
                 type="button"
                 onClick={() => setActiveTab("concepts")}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
+                className={`px-3 py-1.5 sm:px-3.5 rounded-lg text-xs font-semibold transition whitespace-nowrap shrink-0 ${
                   activeTab === "concepts"
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
                     : "text-slate-400 hover:text-white hover:bg-slate-800"
@@ -220,7 +293,7 @@ export default function CoursePage() {
               <button
                 type="button"
                 onClick={() => setActiveTab("timeline")}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
+                className={`px-3 py-1.5 sm:px-3.5 rounded-lg text-xs font-semibold transition whitespace-nowrap shrink-0 ${
                   activeTab === "timeline"
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
                     : "text-slate-400 hover:text-white hover:bg-slate-800"
@@ -232,7 +305,7 @@ export default function CoursePage() {
               <button
                 type="button"
                 onClick={() => setActiveTab("code")}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
+                className={`px-3 py-1.5 sm:px-3.5 rounded-lg text-xs font-semibold transition whitespace-nowrap shrink-0 ${
                   activeTab === "code"
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
                     : "text-slate-400 hover:text-white hover:bg-slate-800"
@@ -354,17 +427,34 @@ export default function CoursePage() {
         </div>
       </main>
 
-      {/* BARRE LATÉRALE DROITE : SOCRATE + AUDIOS (LUNDI, MERCREDI, JEUDI) + QUIZ */}
+      {/* BARRE LATÉRALE DROITE : SOCRATE + AUDIOS (LUNDI, MERCREDI, VENDREDI) + QUIZ */}
       {!isFocusMode && (
         <CourseAssistantSidebar
           moduleId={activeModuleId}
           pedagogicalData={modulePayload}
+          isOpenOnMobile={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
           onContentUpdated={() => {
             fetch(`/api/content/modules/${activeModuleId}`)
               .then((r) => r.json())
               .then((d) => d.success && setModulePayload(d.data));
           }}
         />
+      )}
+
+      {/* Bouton Flottant (FAB) Mobile pour ouvrir Socrate & Quiz */}
+      {!isFocusMode && (
+        <div className="fixed bottom-5 right-5 z-30 lg:hidden">
+          <button
+            type="button"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            className="flex items-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full shadow-2xl shadow-indigo-600/50 border border-indigo-400/30 font-semibold text-xs tracking-wide transition active:scale-95"
+            aria-label="Ouvrir le tuteur Socrate et les quiz"
+          >
+            <span className="text-base">🎙️</span>
+            <span>Socrate & Quiz</span>
+          </button>
+        </div>
       )}
 
     </div>

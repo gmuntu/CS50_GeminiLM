@@ -92,47 +92,48 @@ export default function InteractiveQuizModal({ quiz, isOpen, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4 overflow-y-auto">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[96vh] sm:max-h-[90vh]">
         
         {/* En-tête */}
-        <div className="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-950/60">
+        <div className="p-3.5 sm:p-5 border-b border-slate-800 flex justify-between items-start sm:items-center bg-slate-950/60 gap-3">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs bg-indigo-600/30 text-indigo-300 font-semibold px-2.5 py-0.5 rounded-full border border-indigo-500/30">
                 {dayLabels[quiz.dayOfWeek] || quiz.dayOfWeek}
               </span>
-              <h3 className="text-base font-bold text-white tracking-tight">{quiz.title}</h3>
+              <h3 className="text-sm sm:text-base font-bold text-white tracking-tight">{quiz.title}</h3>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-[11px] sm:text-xs text-slate-400 mt-1">
               {quiz.description || "Évaluez votre compréhension conceptuelle."}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition"
+            className="text-slate-400 hover:text-white p-1.5 sm:p-2 rounded-lg hover:bg-slate-800 transition shrink-0"
+            aria-label="Fermer le quiz"
           >
             ✕
           </button>
         </div>
 
         {/* Corps du Quiz */}
-        <div className="p-6 overflow-y-auto space-y-6 custom-scrollbar">
+        <div className="p-3 sm:p-6 overflow-y-auto space-y-4 sm:space-y-6 custom-scrollbar">
           
           {/* Bannière de Résultat */}
           {result && (
             <div
-              className={`p-4 rounded-xl border ${
+              className={`p-3.5 sm:p-4 rounded-xl border ${
                 result.passed
                   ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-200"
                   : "bg-amber-950/40 border-amber-500/40 text-amber-200"
               } space-y-2 animate-in fade-in duration-300`}
             >
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1.5">
                 <span className="font-bold text-sm flex items-center gap-1.5">
                   {result.passed ? "🎉 Félicitations !" : "📚 À perfectionner"}
                 </span>
-                <span className="text-sm font-extrabold px-3 py-1 bg-slate-900/80 rounded-full border border-slate-700">
+                <span className="text-xs sm:text-sm font-extrabold px-2.5 py-0.5 sm:px-3 sm:py-1 bg-slate-900/80 rounded-full border border-slate-700 w-fit">
                   Score : {result.score} / {result.total} ({result.percentage}%)
                 </span>
               </div>
@@ -150,14 +151,14 @@ export default function InteractiveQuizModal({ quiz, isOpen, onClose }: Props) {
             return (
               <div
                 key={q.id}
-                className="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-3"
+                className="bg-slate-950/60 p-3.5 sm:p-4 rounded-xl border border-slate-800 space-y-2.5 sm:space-y-3"
               >
-                <div className="flex justify-between items-start gap-3">
-                  <h4 className="text-sm font-semibold text-slate-100 leading-snug">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1.5 sm:gap-3">
+                  <h4 className="text-xs sm:text-sm font-semibold text-slate-100 leading-snug">
                     <span className="text-indigo-400 mr-1.5">Q{qIndex + 1}.</span>
                     {q.question}
                   </h4>
-                  <span className="text-[10px] uppercase font-bold text-slate-500 bg-slate-900 px-2 py-0.5 rounded border border-slate-800 whitespace-nowrap">
+                  <span className="text-[10px] uppercase font-bold text-slate-500 bg-slate-900 px-2 py-0.5 rounded border border-slate-800 whitespace-nowrap w-fit">
                     {q.conceptTested}
                   </span>
                 </div>
@@ -186,7 +187,7 @@ export default function InteractiveQuizModal({ quiz, isOpen, onClose }: Props) {
                         type="button"
                         onClick={() => handleSelect(q.id, opt.id)}
                         disabled={Boolean(result)}
-                        className={`w-full text-left p-3 rounded-lg border text-xs flex items-center gap-3 transition-all ${optionStyle}`}
+                        className={`w-full text-left p-2.5 sm:p-3 min-h-[44px] rounded-lg border text-xs flex items-center gap-2.5 sm:gap-3 transition-all ${optionStyle}`}
                       >
                         <span
                           className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[11px] shrink-0 ${
@@ -199,10 +200,10 @@ export default function InteractiveQuizModal({ quiz, isOpen, onClose }: Props) {
                         </span>
                         <span className="flex-1">{opt.text}</span>
                         {result && opt.id === q.correctOption && (
-                          <span className="text-emerald-400 text-xs font-bold">✓ Bonne réponse</span>
+                          <span className="text-emerald-400 text-xs font-bold shrink-0">✓ Bonne réponse</span>
                         )}
                         {result && isSelected && !reviewItem?.isCorrect && (
-                          <span className="text-rose-400 text-xs font-bold">✗ Piège</span>
+                          <span className="text-rose-400 text-xs font-bold shrink-0">✗ Piège</span>
                         )}
                       </button>
                     );
@@ -226,17 +227,17 @@ export default function InteractiveQuizModal({ quiz, isOpen, onClose }: Props) {
         </div>
 
         {/* Pied de page / Actions */}
-        <div className="p-4 border-t border-slate-800 bg-slate-950/80 flex justify-between items-center">
+        <div className="p-3.5 sm:p-4 border-t border-slate-800 bg-slate-950/80 flex flex-col sm:flex-row justify-between items-center gap-2.5 sm:gap-0">
           <span className="text-xs text-slate-500">
             {Object.keys(selectedAnswers).length} sur {quiz.questions.length} question(s) renseignée(s)
           </span>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             {result ? (
               <button
                 type="button"
                 onClick={handleReset}
-                className="px-4 py-2 rounded-xl text-xs font-medium bg-slate-800 text-slate-200 hover:bg-slate-700 transition"
+                className="w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-medium bg-slate-800 text-slate-200 hover:bg-slate-700 transition text-center"
               >
                 🔄 Recommencer le quiz
               </button>
@@ -245,7 +246,7 @@ export default function InteractiveQuizModal({ quiz, isOpen, onClose }: Props) {
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting || Object.keys(selectedAnswers).length === 0}
-                className="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition disabled:opacity-50 disabled:cursor-not-allowed text-center"
               >
                 {isSubmitting ? "Correction en cours..." : "Valider mes réponses"}
               </button>
