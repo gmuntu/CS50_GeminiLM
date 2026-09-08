@@ -444,8 +444,8 @@ export default function CoursePage() {
         />
       )}
 
-      {/* Bouton Flottant (FAB) Mobile pour ouvrir Socrate & Quiz avec Safe Area iPhone */}
-      {!isFocusMode && (
+      {/* Bouton Flottant (FAB) Mobile pour ouvrir Socrate & Quiz avec Safe Area iPhone (masqué quand le tiroir est ouvert) */}
+      {!isFocusMode && !isMobileSidebarOpen && (
         <div className="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom,0px))] right-4 sm:right-5 z-30 lg:hidden">
           <button
             type="button"

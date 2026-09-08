@@ -359,14 +359,14 @@ export default function CourseAssistantSidebar({
 
       <aside
         className={`
-          fixed top-0 right-0 z-50 h-screen h-[100dvh] w-full sm:w-96 bg-slate-950 text-slate-100 p-4 pt-[calc(1rem+env(safe-area-inset-top,0px))] pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] shadow-2xl flex flex-col overflow-y-auto custom-scrollbar border-l border-slate-800 transition-transform duration-300 ease-in-out overscroll-contain
-          lg:static lg:translate-x-0 lg:z-auto lg:h-screen lg:shrink-0 lg:border-l-0 lg:pt-4 lg:pb-4
+          fixed top-0 right-0 z-50 h-screen h-[100dvh] w-full sm:w-96 bg-slate-950 text-slate-100 shadow-2xl flex flex-col overflow-hidden border-l border-slate-800 transition-transform duration-300 ease-in-out overscroll-contain
+          lg:static lg:translate-x-0 lg:z-auto lg:h-screen lg:shrink-0 lg:border-l-0
           ${isOpenOnMobile ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
           ${!isOpenOnMobile ? "hidden lg:flex" : "flex"}
         `}
       >
-        {/* Entête Mobile de fermeture */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3 lg:hidden">
+        {/* Entête Mobile de fermeture avec Safe Area iPhone */}
+        <div className="flex items-center justify-between p-4 pt-[calc(1rem+env(safe-area-inset-top,0px))] pb-3 border-b border-slate-800 shrink-0 lg:hidden bg-slate-950">
           <div className="flex items-center gap-2">
             <span className="text-xl">🎙️</span>
             <div>
@@ -383,9 +383,12 @@ export default function CourseAssistantSidebar({
             ✕
           </button>
         </div>
-        
-        {/* --- PANNEAU PÉDAGOGIQUE DU MODULE --- */}
-        <div className="mb-4 p-4 rounded-xl bg-slate-900 border border-slate-800 shadow-sm relative overflow-hidden space-y-3">
+
+        {/* CORPS DE CONTENU DÉFILANT (PANNEAU PÉDAGOGIQUE + CONVERSATION) */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar min-h-0">
+          
+          {/* --- PANNEAU PÉDAGOGIQUE DU MODULE --- */}
+          <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 shadow-sm relative overflow-hidden space-y-3">
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
           {/* 1. SÉLECTEUR DES 3 AUDIOS SOCRATIQUES (LUNDI, MERCREDI, JEUDI) */}
@@ -552,8 +555,13 @@ export default function CourseAssistantSidebar({
         </div>
 
         {/* --- SECTION CHAT EN DIRECT AVEC LE TUTEUR SOCRATE --- */}
-        <div className="flex-1 flex flex-col min-h-64 bg-slate-900/60 rounded-xl border border-slate-800 p-3">
-          <div className="flex-1 overflow-y-auto mb-3 pr-2 space-y-4 custom-scrollbar">
+        <div className="bg-slate-900/60 rounded-xl border border-slate-800 p-3.5 space-y-3">
+          <div className="flex items-center gap-2 pb-2 border-b border-slate-800/80">
+            <span className="text-sm">🏛️</span>
+            <span className="text-xs font-bold text-slate-200">Discussion avec Socrate</span>
+          </div>
+
+          <div className="space-y-4">
             {messages.map((m, idx) => (
               <div
                 key={idx}
@@ -630,16 +638,20 @@ export default function CourseAssistantSidebar({
             ))}
             <div ref={messagesEndRef} />
           </div>
+        </div>
 
-          {/* Formulaire de saisie & micro */}
-          <form onSubmit={handleSend} className="flex gap-2 pt-2 border-t border-slate-800">
+        </div>
+
+        {/* --- FORMULAIRE DE SAISIE FIXÉ EN BAS AVEC SAFE-AREA IPHONE --- */}
+        <div className="shrink-0 p-3 pt-2.5 pb-[calc(1.25rem+env(safe-area-inset-bottom,16px))] sm:pb-3 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 relative z-20">
+          <form onSubmit={handleSend} className="flex gap-2 items-center">
             <button
               type="button"
               onClick={startListening}
-              className={`p-2.5 rounded-xl border transition ${
+              className={`p-2.5 rounded-xl border transition shrink-0 ${
                 isListening
                   ? "bg-rose-600 text-white border-rose-500 animate-pulse"
-                  : "bg-slate-900 border-slate-800 text-slate-400 hover:text-white"
+                  : "bg-slate-800 border-slate-700 text-slate-400 hover:text-white"
               }`}
               title="Dictée vocale"
             >
@@ -651,13 +663,16 @@ export default function CourseAssistantSidebar({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Pose ta question à Socrate..."
-              className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-base sm:text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+              className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-base sm:text-xs text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition relative z-20 cursor-text"
+              autoComplete="off"
+              autoCorrect="on"
+              enterKeyHint="send"
             />
 
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition disabled:opacity-50 shadow-md shadow-indigo-600/30"
+              className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition disabled:opacity-50 shadow-md shadow-indigo-600/30 shrink-0"
             >
               {isLoading ? "..." : "Envoyer"}
             </button>
