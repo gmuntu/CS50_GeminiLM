@@ -100,7 +100,7 @@ export default function CoursePage() {
   const videoSummary: VideoSummaryData | null = modulePayload?.videoSummary || null;
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen h-[100dvh] bg-slate-950 text-slate-300 overflow-hidden font-sans relative">
+    <div className="flex flex-col lg:flex-row h-screen h-[100svh] min-h-[100svh] max-h-[100svh] bg-slate-950 text-slate-300 overflow-hidden font-sans relative">
       
       {/* BARRE SUPÉRIEURE MOBILE AVEC SAFE-AREA POUR IPHONE (ENCOCHE / DYNAMIC ISLAND) */}
       <header className="flex items-center justify-between px-4 pt-[calc(0.75rem+env(safe-area-inset-top,0px))] pb-3 bg-slate-900 border-b border-slate-800 shrink-0 z-30 lg:hidden">
@@ -150,8 +150,8 @@ export default function CoursePage() {
       {!isFocusMode && (
         <nav
           className={`
-            fixed top-0 left-0 z-50 h-screen h-[100dvh] w-72 sm:w-80 bg-slate-900 border-r border-slate-800 flex flex-col shadow-2xl transition-transform duration-300 ease-in-out overscroll-contain
-            lg:static lg:translate-x-0 lg:z-10 lg:h-full lg:w-64 lg:shadow-xl lg:shrink-0
+            fixed inset-y-0 left-0 z-50 h-[100svh] max-h-[100svh] w-72 sm:w-80 bg-slate-900 border-r border-slate-800 flex flex-col shadow-2xl transition-transform duration-300 ease-in-out overscroll-contain
+            lg:static lg:inset-auto lg:translate-x-0 lg:z-10 lg:h-full lg:w-64 lg:shadow-xl lg:shrink-0
             ${isMobileNavOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
             ${!isMobileNavOpen ? "hidden lg:flex" : "flex"}
           `}

@@ -93,7 +93,7 @@ export default function InteractiveQuizModal({ quiz, isOpen, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4 pt-[calc(0.5rem+env(safe-area-inset-top,0px))] pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] overflow-y-auto overscroll-contain">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92dvh] sm:max-h-[90vh]">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90svh] sm:max-h-[90vh]">
         
         {/* En-tête */}
         <div className="p-3.5 sm:p-5 border-b border-slate-800 flex justify-between items-start sm:items-center bg-slate-950/60 gap-3">

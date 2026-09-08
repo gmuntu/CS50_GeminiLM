@@ -359,8 +359,8 @@ export default function CourseAssistantSidebar({
 
       <aside
         className={`
-          fixed top-0 right-0 z-50 h-screen h-[100dvh] w-full sm:w-96 bg-slate-950 text-slate-100 shadow-2xl flex flex-col overflow-hidden border-l border-slate-800 transition-transform duration-300 ease-in-out overscroll-contain
-          lg:static lg:translate-x-0 lg:z-auto lg:h-screen lg:shrink-0 lg:border-l-0
+          fixed inset-y-0 right-0 z-50 h-[100svh] max-h-[100svh] w-full sm:w-96 bg-slate-950 text-slate-100 shadow-2xl flex flex-col overflow-hidden border-l border-slate-800 transition-transform duration-300 ease-in-out overscroll-contain
+          lg:static lg:inset-auto lg:translate-x-0 lg:z-auto lg:h-screen lg:shrink-0 lg:border-l-0
           ${isOpenOnMobile ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
           ${!isOpenOnMobile ? "hidden lg:flex" : "flex"}
         `}
@@ -643,8 +643,8 @@ export default function CourseAssistantSidebar({
         </div>
 
         {/* --- FORMULAIRE DE SAISIE FIXÉ EN BAS AVEC SAFE-AREA IPHONE --- */}
-        <div className="shrink-0 p-3 pt-2.5 pb-[calc(1.25rem+env(safe-area-inset-bottom,16px))] sm:pb-3 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 relative z-20">
-          <form onSubmit={handleSend} className="flex gap-2 items-center">
+        <div className="shrink-0 w-full p-3 pt-2.5 pb-[calc(0.75rem+env(safe-area-inset-bottom,12px))] sm:pb-3 bg-slate-900 border-t border-slate-800 relative z-30 shadow-2xl">
+          <form onSubmit={handleSend} className="flex gap-2 items-center w-full">
             <button
               type="button"
               onClick={startListening}
@@ -663,7 +663,7 @@ export default function CourseAssistantSidebar({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Pose ta question à Socrate..."
-              className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-base sm:text-xs text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition relative z-20 cursor-text"
+              className="flex-1 min-w-0 bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-base sm:text-xs text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition relative z-20 cursor-text"
               autoComplete="off"
               autoCorrect="on"
               enterKeyHint="send"
@@ -672,7 +672,7 @@ export default function CourseAssistantSidebar({
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition disabled:opacity-50 shadow-md shadow-indigo-600/30 shrink-0"
+              className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition disabled:opacity-50 shadow-md shadow-indigo-600/30 shrink-0 whitespace-nowrap"
             >
               {isLoading ? "..." : "Envoyer"}
             </button>
