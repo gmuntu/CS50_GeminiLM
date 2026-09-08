@@ -90,18 +90,20 @@ export default function CoursePage() {
 
   const getEmbedUrl = (url?: string) => {
     if (!url) return "";
-    if (url.includes("/embed/")) return url;
+    if (url.includes("/embed/")) {
+      return url.includes("playsinline=1") ? url : `${url}${url.includes("?") ? "&" : "?"}playsinline=1`;
+    }
     const match = url.match(/(?:v=|\/embed\/|\/v\/|youtu\.be\/)([^&?]+)/);
-    return match ? `https://www.youtube.com/embed/${match[1]}?enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}` : url;
+    return match ? `https://www.youtube.com/embed/${match[1]}?enablejsapi=1&playsinline=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}` : url;
   };
 
   const videoSummary: VideoSummaryData | null = modulePayload?.videoSummary || null;
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-slate-950 text-slate-300 overflow-hidden font-sans relative">
+    <div className="flex flex-col lg:flex-row h-screen h-[100dvh] bg-slate-950 text-slate-300 overflow-hidden font-sans relative">
       
-      {/* BARRE SUPÉRIEURE MOBILE */}
-      <header className="flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800 shrink-0 z-30 lg:hidden">
+      {/* BARRE SUPÉRIEURE MOBILE AVEC SAFE-AREA POUR IPHONE (ENCOCHE / DYNAMIC ISLAND) */}
+      <header className="flex items-center justify-between px-4 pt-[calc(0.75rem+env(safe-area-inset-top,0px))] pb-3 bg-slate-900 border-b border-slate-800 shrink-0 z-30 lg:hidden">
         <div className="flex items-center gap-2.5">
           <button
             type="button"
@@ -144,17 +146,17 @@ export default function CoursePage() {
         />
       )}
 
-      {/* MENU DE NAVIGATION LATÉRAL GAUCHE (TIROIR COULISSANT MOBILE / FIXE DESKTOP) */}
+      {/* MENU DE NAVIGATION LATÉRAL GAUCHE (TIROIR COULISSANT MOBILE / FIXE DESKTOP AVEC SAFE-AREA IPHONE) */}
       {!isFocusMode && (
         <nav
           className={`
-            fixed top-0 left-0 z-50 h-screen w-72 sm:w-80 bg-slate-900 border-r border-slate-800 flex flex-col shadow-2xl transition-transform duration-300 ease-in-out
+            fixed top-0 left-0 z-50 h-screen h-[100dvh] w-72 sm:w-80 bg-slate-900 border-r border-slate-800 flex flex-col shadow-2xl transition-transform duration-300 ease-in-out overscroll-contain
             lg:static lg:translate-x-0 lg:z-10 lg:h-full lg:w-64 lg:shadow-xl lg:shrink-0
             ${isMobileNavOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
             ${!isMobileNavOpen ? "hidden lg:flex" : "flex"}
           `}
         >
-          <div className="p-5 sm:p-6 border-b border-slate-800 flex items-center justify-between">
+          <div className="p-5 sm:p-6 pt-[calc(1.25rem+env(safe-area-inset-top,0px))] border-b border-slate-800 flex items-center justify-between">
             <div>
               <h1 className="text-xl sm:text-2xl font-extrabold text-white">Savoir IA</h1>
               <p className="text-xs text-indigo-400 mt-0.5 font-medium">CS50x Francophone</p>
@@ -179,7 +181,7 @@ export default function CoursePage() {
             </Link>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-4 space-y-1.5 sm:space-y-2 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-4 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] space-y-1.5 sm:space-y-2 custom-scrollbar">
             {CS50_MODULES.map((mod) => (
               <button
                 key={mod.id}
@@ -201,7 +203,7 @@ export default function CoursePage() {
       )}
 
       {/* ZONE CENTRALE : LECTEUR VIDÉO & GRANDS RÉSUMÉS PÉDAGOGIQUES */}
-      <main className="flex-1 flex flex-col items-center p-3 sm:p-6 bg-slate-950 overflow-y-auto custom-scrollbar w-full min-w-0">
+      <main className="flex-1 flex flex-col items-center p-3 sm:p-6 pb-[calc(6rem+env(safe-area-inset-bottom,0px))] lg:pb-6 bg-slate-950 overflow-y-auto custom-scrollbar w-full min-w-0">
         <div className="w-full max-w-4xl space-y-5 sm:space-y-6">
           
           {/* En-tête du Module avec Action de Génération */}
@@ -442,9 +444,9 @@ export default function CoursePage() {
         />
       )}
 
-      {/* Bouton Flottant (FAB) Mobile pour ouvrir Socrate & Quiz */}
+      {/* Bouton Flottant (FAB) Mobile pour ouvrir Socrate & Quiz avec Safe Area iPhone */}
       {!isFocusMode && (
-        <div className="fixed bottom-5 right-5 z-30 lg:hidden">
+        <div className="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom,0px))] right-4 sm:right-5 z-30 lg:hidden">
           <button
             type="button"
             onClick={() => setIsMobileSidebarOpen(true)}

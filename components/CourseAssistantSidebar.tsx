@@ -125,6 +125,9 @@ export default function CourseAssistantSidebar({
     if (onInteract) onInteract();
     setIsAudioLoading(true);
 
+    // Initialisation synchrone de l'Audio pour satisfaire la politique de geste tactile d'iOS Safari
+    const audio = new Audio();
+
     try {
       const response = await fetch("/api/speech", {
         method: "POST",
@@ -137,7 +140,7 @@ export default function CourseAssistantSidebar({
         throw new Error(data.error || "Erreur lors de la synthèse vocale.");
       }
 
-      const audio = new Audio("data:audio/mp3;base64," + data.audioContent);
+      audio.src = "data:audio/mp3;base64," + data.audioContent;
       setIsPlayingDayAudio(true);
       setIsAudioLoading(false);
 
@@ -310,6 +313,9 @@ export default function CourseAssistantSidebar({
     if (!cleanText) return;
     setSpeakingIdx(idx);
 
+    // Initialisation synchrone de l'Audio pour satisfaire la politique de geste tactile d'iOS Safari
+    const audio = new Audio();
+
     try {
       const response = await fetch("/api/speech", {
         method: "POST",
@@ -322,7 +328,7 @@ export default function CourseAssistantSidebar({
         throw new Error(data.error || "Erreur TTS");
       }
 
-      const audio = new Audio("data:audio/mp3;base64," + data.audioContent);
+      audio.src = "data:audio/mp3;base64," + data.audioContent;
       audio.onended = () => {
         setSpeakingIdx(null);
         setCurrentAudio(null);
@@ -353,8 +359,8 @@ export default function CourseAssistantSidebar({
 
       <aside
         className={`
-          fixed top-0 right-0 z-50 h-screen w-full sm:w-96 bg-slate-950 text-slate-100 p-4 shadow-2xl flex flex-col overflow-y-auto custom-scrollbar border-l border-slate-800 transition-transform duration-300 ease-in-out
-          lg:static lg:translate-x-0 lg:z-auto lg:h-screen lg:shrink-0 lg:border-l-0
+          fixed top-0 right-0 z-50 h-screen h-[100dvh] w-full sm:w-96 bg-slate-950 text-slate-100 p-4 pt-[calc(1rem+env(safe-area-inset-top,0px))] pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] shadow-2xl flex flex-col overflow-y-auto custom-scrollbar border-l border-slate-800 transition-transform duration-300 ease-in-out overscroll-contain
+          lg:static lg:translate-x-0 lg:z-auto lg:h-screen lg:shrink-0 lg:border-l-0 lg:pt-4 lg:pb-4
           ${isOpenOnMobile ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
           ${!isOpenOnMobile ? "hidden lg:flex" : "flex"}
         `}
@@ -645,7 +651,7 @@ export default function CourseAssistantSidebar({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Pose ta question à Socrate..."
-              className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+              className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-base sm:text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
             />
 
             <button

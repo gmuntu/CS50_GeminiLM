@@ -60,7 +60,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-4 sm:p-8">
+    <div className="min-h-screen min-h-[100dvh] bg-gray-950 text-white p-4 sm:p-8 pt-[calc(1.25rem+env(safe-area-inset-top,0px))] pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] sm:pt-8 sm:pb-8">
       <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8">
         
         {/* Header */}
